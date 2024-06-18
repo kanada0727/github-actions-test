@@ -8,6 +8,9 @@ jobs:
   test-print:
     name: test print
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
     strategy:
       fail-fast: false
       matrix:
@@ -67,8 +70,8 @@ jobs:
         run: poetry build
           
       - name: create release
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{steps.current-pyproject-version.outputs.pyproject-version}}
-          files: dist/*
-          token: ${{secrets.GITHUB_TOKEN}}
+          tag: ${{steps.current-pyproject-version.outputs.pyproject-version}}
+          artifacts: dist/*
+          makeLatest: true
