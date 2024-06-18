@@ -1,0 +1,56 @@
+run-name: test-workflow
+on:
+  push:
+    branches: 
+      - "main"
+
+jobs:
+  test-print:
+    name: test print
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+  
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      #----------------------------------------------
+      #  -----  install & configure poetry  -----
+      #----------------------------------------------
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      #----------------------------------------------
+      #       load cached venv if cache exists
+      #----------------------------------------------
+      # - name: Load cached venv
+      #  id: cached-poetry-dependencies
+      #  uses: actions/cache@v3
+      #  with:
+      #    path: .venv
+      #    key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      #----------------------------------------------
+      # install dependencies if cache does not exist
+      #----------------------------------------------
+      #- name: Install dependencies
+      #  if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      #  run: poetry install
+
+      - name: get current pyproject version
+        id: current-pyproject-version
+        run: echo "pyproject-version=$(poetry version -s)" >> $GITHUB_OUTPUT
+      - name: run something
+        env:
+          PYPROJECT_VERSION: ${{steps.current-pyproject-version.outputs.pyproject-version}}
+        if: ${{env.PYPROJECT_VERSION}} == $(git tag ${{env.PYPROJECT_VERSION}}) && endsWith(${{env.PYPROJECT_VERSION}}, "dev") == false
+        run: echo OK
+
