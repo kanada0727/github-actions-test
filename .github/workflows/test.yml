@@ -55,11 +55,15 @@ jobs:
         run: |
           echo "no-existing-tag=$(if [ ${{env.PYPROJECT_VERSION}} = $(git tag -l ${{env.PYPROJECT_VERSION}}) ]; then echo false; else echo true; fi)" >> $GITHUB_OUTPUT
           echo "no-dev-tag=${{endsWith(env.PYPROJECT_VERSION, 'dev') == false}}" >> $GITHUB_OUTPUT
-
-      - name: run something
+      - name: evaluate final build condition
+        id: final-build-condition
         env:
           NO_EXISTING_TAG: ${{steps.build-condition.outputs.no-existing-tag}}
           NO_DEV_TAG: ${{steps.build-condition.outputs.no-dev-tag}}
-        # if: env.NO_EXISTING_TAG == true && env.NO_DEV_TAG == true
-        run: echo OK
+        run: echo "build-flag=${{env.NO_EXISTING_TAG == 'true' && env.NO_DEV_TAG == 'true'}}" >> $GITHUB_OUTPUT
+
+      - name: run build
+        if: ${{steps.final-build-condition.outputs.build-flag}} == 'true'
+        run: poetry build
+          
 
