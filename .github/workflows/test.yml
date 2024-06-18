@@ -66,10 +66,11 @@ jobs:
         run: echo "build-flag=${{env.NO_EXISTING_TAG == 'true' && env.NO_DEV_TAG == 'true'}}" >> $GITHUB_OUTPUT
 
       - name: run build
-        if: ${{steps.final-build-condition.outputs.build-flag}} == 'true'
+        if: steps.final-build-condition.outputs.build-flag == true
         run: poetry build
           
       - name: create release
+        if: steps.final-build-condition.outputs.build-flag == true
         uses: ncipollo/release-action@v1
         with:
           tag: ${{steps.current-pyproject-version.outputs.pyproject-version}}
