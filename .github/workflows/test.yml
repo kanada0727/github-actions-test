@@ -48,9 +48,18 @@ jobs:
       - name: get current pyproject version
         id: current-pyproject-version
         run: echo "pyproject-version=$(poetry version -s)" >> $GITHUB_OUTPUT
-      - name: run something
+      - name: evaluate build condition
+        id: build-condition
         env:
           PYPROJECT_VERSION: ${{steps.current-pyproject-version.outputs.pyproject-version}}
-        if: ${{env.PYPROJECT_VERSION}} == $(git tag ${{env.PYPROJECT_VERSION}}) && endsWith(${{env.PYPROJECT_VERSION}}, "dev") == false
+        run: |
+          echo "no-existing-tag=${{env.PYPROJECT_VERSION}} != $(git tag ${{env.PYPROJECT_VERSION}})" >> $GITHUB_OUTPUT
+          echo "no-dev-tag=${{endsWith(env.PYPROJECT_VERSION, 'dev') == false}}" >> $GITHUB_OUTPUT
+
+      - name: run something
+        env:
+          NO_EXISTING_TAG: ${{steps.build-condition.outputs.no-existing-tag}}
+          NO_DEV_TAG: ${{steps.build-condition.outputs.no-dev-tag}}
+        if: env.NO_EXISTING_TAG == true && env.NO_DEV_TAG == true
         run: echo OK
 
