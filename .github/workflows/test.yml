@@ -53,13 +53,13 @@ jobs:
         env:
           PYPROJECT_VERSION: ${{steps.current-pyproject-version.outputs.pyproject-version}}
         run: |
-          echo "no-existing-tag=${{env.PYPROJECT_VERSION}} != $(git tag ${{env.PYPROJECT_VERSION}})" >> $GITHUB_OUTPUT
+          echo "no-existing-tag=$(${{env.PYPROJECT_VERSION}} != $(git tag -l ${{env.PYPROJECT_VERSION}}))" >> $GITHUB_OUTPUT
           echo "no-dev-tag=${{endsWith(env.PYPROJECT_VERSION, 'dev') == false}}" >> $GITHUB_OUTPUT
 
       - name: run something
         env:
           NO_EXISTING_TAG: ${{steps.build-condition.outputs.no-existing-tag}}
           NO_DEV_TAG: ${{steps.build-condition.outputs.no-dev-tag}}
-        if: env.NO_EXISTING_TAG == true && env.NO_DEV_TAG == true
+        # if: env.NO_EXISTING_TAG == true && env.NO_DEV_TAG == true
         run: echo OK
 
