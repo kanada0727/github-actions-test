@@ -66,4 +66,9 @@ jobs:
         if: ${{steps.final-build-condition.outputs.build-flag}} == 'true'
         run: poetry build
           
-
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{steps.current-pyproject-version.outputs.pyproject-version}}
+          files: dist/*
+          token: ${{secrets.GITHUB_TOKEN}}
