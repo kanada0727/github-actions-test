@@ -59,7 +59,7 @@ jobs:
           PYPROJECT_VERSION: ${{steps.current-pyproject-version.outputs.pyproject-version}}
         run: |
           echo "no-existing-tag=$(if [ ${{env.PYPROJECT_VERSION}} = $(git tag -l ${{env.PYPROJECT_VERSION}}) ]; then echo false; else echo true; fi)" >> $GITHUB_OUTPUT
-          echo "no-dev-tag=${{endsWith(env.PYPROJECT_VERSION, 'dev') == false}}" >> $GITHUB_OUTPUT
+          echo "no-dev-tag=${{contains(env.PYPROJECT_VERSION, 'dev') == false}}" >> $GITHUB_OUTPUT
       - name: evaluate final build condition
         id: final-build-condition
         env:
