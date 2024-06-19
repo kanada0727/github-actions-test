@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "github-actions-test"
-version = "0.3.2dev0"
+version = "0.3.3"
 description = ""
 authors = ["Kentaro Kanada <kanada.kentaro0727@gmail.com>"]
 readme = "README.md"
